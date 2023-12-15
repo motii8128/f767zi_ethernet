@@ -18,6 +18,7 @@ class UDPHandler{
         void init_net(const char *base_ip);
         void open_udp(const uint16_t port);
         void set_destination(const char *dest_ip, const uint16_t port);
+        void close();
 
         template<typename T> void send(T data);
         template<typename T> T receive();

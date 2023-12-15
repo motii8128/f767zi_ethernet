@@ -15,7 +15,7 @@ void UDPHandler::init_net(const char *base_ip)
 
     if(net.connect() != 0)
     {
-        printf("[ERROR]Failed to connect network");
+        printf("[ERROR]Failed to connect network\n");
     }
     else
     {
@@ -35,6 +35,12 @@ void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
     destination.set_port(port);
 }
 
+void UDPHandler::close()
+{
+    udp.close();
+    net.disconnect();
+}
+
 template<typename T>
 void UDPHandler::send(T data)
 {
@@ -46,7 +52,7 @@ void UDPHandler::send(T data)
     }
     else
     {
-        printf("[UDPHandler]send data");
+        printf("[UDPHandler]send data\n");
     }
 }
 
@@ -60,16 +66,21 @@ T UDPHandler::receive()
     memset(buf, 0, sizeof(buf));
     if(const int result = udp.recvfrom(&source, buf, sizeof(buf)) < 0)
     {
-        printf("[ERROR]Failed to receive ");
+        printf("[ERROR]Failed to receive\n");
+        auto report = state_msg();
+        report.message = std::string("[MicroController] Failed to get data");
+        report.error = true;
+        send<state_msg>(report);
 
-        
     }
     else
     {
-        printf("[UDPHandler]receive data");
+        printf("[UDPHandler]receive data\n");
         
-        std::string msg = "[MicroController]Get data";
-        send<std::string>(msg);
+        auto report = state_msg();
+        report.message = std::string("[MicroController] Get data");
+        report.error = false;
+        send<state_msg>(report);
 
         return deserialize<T>(buf);
     }
