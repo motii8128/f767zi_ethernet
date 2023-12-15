@@ -16,6 +16,12 @@ struct wheel_msg{
     float motor_rr;
 };
 
+struct state_msg
+{
+    bool error;
+    std::string message;
+};
+
 template <typename T>
 T deserialize(std::vector<uint8_t>& bytes) {
     static_assert(std::is_trivially_copyable<T>::value, "Data type is not trivially copyable");
