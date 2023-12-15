@@ -11,11 +11,16 @@
 #include <vector>
 #include <string>
 
+#include "interface.hpp"
+
 class UDPHandler{
     public:
         void init_net(const char *base_ip);
         void open_udp(const uint16_t port);
         void set_destination(const char *dest_ip, const uint16_t port);
+
+        template<typename T> T send();
+        template<typename T> T receive();
         
     private:
         EthernetInterface net;
