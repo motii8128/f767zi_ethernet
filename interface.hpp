@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
+#include <string>
 #include <vector>
 
 struct wheel_msg{
@@ -13,11 +14,6 @@ struct wheel_msg{
     float motor_fr;
     float motor_rl;
     float motor_rr;
-};
-
-struct report_msg{
-    const char message;
-    int code;
 };
 
 template <typename T>
