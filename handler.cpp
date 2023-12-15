@@ -3,6 +3,7 @@
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
+#include <string>
 
 void UDPHandler::init_net(const char *base_ip)
 {
@@ -35,9 +36,18 @@ void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
 }
 
 template<typename T>
-T UDPHandler::send()
+void UDPHandler::send(T data)
 {
-    
+    char send_data[100];
+    send_data = serialize<T>(data);
+    if(const int result = udp.sendto(destination, send_data, sizeof(send_data)) < 0)
+    {
+        printf("[ERROR]Failed to send\n");
+    }
+    else
+    {
+        printf("[UDPHandler]send data");
+    }
 }
 
 template <typename T>
@@ -47,16 +57,20 @@ T UDPHandler::receive()
 
     char buf[256];
 
-    while(1)
+    memset(buf, 0, sizeof(buf));
+    if(const int result = udp.recvfrom(&source, buf, sizeof(buf)) < 0)
     {
-        memset(buf, 0, sizeof(buf));
-        if(const int result = udp.recvfrom(&source, buf, sizeof(buf)) < 0)
-        {
-            printf("[ERROR]Failed to receive ");
-        }
-        else
-        {
-            return deserialize<T>(buf);
-        }
+        printf("[ERROR]Failed to receive ");
+
+        
+    }
+    else
+    {
+        printf("[UDPHandler]receive data");
+        
+        std::string msg = "[MicroController]Get data";
+        send<std::string>(msg);
+
+        return deserialize<T>(buf);
     }
 }
