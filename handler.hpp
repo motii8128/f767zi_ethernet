@@ -19,7 +19,7 @@ class UDPHandler{
         void open_udp(const uint16_t port);
         void set_destination(const char *dest_ip, const uint16_t port);
 
-        template<typename T> T send();
+        template<typename T> void send(T data);
         template<typename T> T receive();
         
     private:
