@@ -5,6 +5,11 @@
 #include <cstring>
 #include <string>
 
+UDPHandler::UDPHandler()
+{
+    close();
+}
+
 void UDPHandler::init_net(const char *base_ip)
 {
     net.set_dhcp(false);
@@ -13,14 +18,13 @@ void UDPHandler::init_net(const char *base_ip)
 
     printf("Start connection\n");
 
-    if(net.connect() != 0)
+
+    while(net.connect() != 0)
     {
-        printf("[ERROR]Failed to connect network\n");
+        printf(".");
     }
-    else
-    {
-        printf("[UDPHandler]network connection success\n");
-    }
+
+    printf("[UDPHandler]connection success\n");
 }
 
 void UDPHandler::open_udp(const uint16_t port)
