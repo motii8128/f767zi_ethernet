@@ -15,11 +15,7 @@ struct wheel_msg{
     float motor_rr;
 };
 
-struct state_msg
-{
-    bool error;
-    char message[100];
-};
+
 
 template <typename T>
 T deserialize(std::vector<uint8_t>& bytes) {
