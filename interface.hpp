@@ -6,7 +6,6 @@
 #include <cstdlib>
 #include <cstring>
 #include <cwchar>
-#include <string>
 #include <vector>
 
 struct wheel_msg{
@@ -19,7 +18,7 @@ struct wheel_msg{
 struct state_msg
 {
     bool error;
-    std::string message;
+    char message[100];
 };
 
 template <typename T>
