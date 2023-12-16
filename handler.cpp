@@ -6,7 +6,7 @@
 #include <cstring>
 #include <string>
 
-UDPHandler::UDPHandler()
+UDPHandler::UDPHandler():msg("[MicroController]safe callback")
 {
     close();
 }
@@ -17,7 +17,7 @@ void UDPHandler::init_net(const char *base_ip)
 
     net.set_network(base_ip, "255.255.255.0", "");
 
-    printf("Start connection\n");
+    printf("[UDPHandler]Start connection\n");
 
 
     while(net.connect() != 0)
@@ -45,27 +45,25 @@ void UDPHandler::close()
 {
     printf("[UDPHandler]close UDP\n");
     udp.close();
-    printf("disconnect net\n");
+    printf("[UDPHandler]disconnect net\n");
     net.disconnect();
 }
 
-template<typename T>
-void UDPHandler::send(T data)
+
+void UDPHandler::report()
 {
-    char send_data[100];
-    send_data = serialize<T>(data);
-    if(const int result = udp.sendto(destination, send_data, sizeof(send_data)) < 0)
+    if(const int result = udp.sendto(destination, msg, sizeof(msg)) < 0)
     {
         printf("[ERROR]Failed to send\n");
     }
     else
     {
-        printf("[UDPHandler]send data\n");
+        
     }
 }
 
-template <typename T>
-T UDPHandler::receive()
+template <typename U>
+U UDPHandler::receive()
 {
     SocketAddress source;
 
@@ -75,23 +73,12 @@ T UDPHandler::receive()
     if(const int result = udp.recvfrom(&source, buf, sizeof(buf)) < 0)
     {
         printf("[ERROR]Failed to receive\n");
-        auto report = state_msg();
-        char msg[100] = "[MicroController] Failed to get data";
-        memcpy(report.message, msg, sizeof(msg));
-        report.error = true;
-        send<state_msg>(report);
-
     }
     else
     {
         printf("[UDPHandler]receive data\n");
-        
-        auto report = state_msg();
-        char msg[100] = "[MicroController] Get data";
-        memcpy(report.message, msg, sizeof(msg));
-        report.error = false;
-        send<state_msg>(report);
+        report();
 
-        return deserialize<T>(buf);
+        return deserialize<U>(buf);
     }
 }
