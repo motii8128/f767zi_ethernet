@@ -11,13 +11,13 @@ UDPHandler::UDPHandler():msg("[MicroController]safe callback")
     close();
 }
 
-void UDPHandler::init_net(const char *base_ip)
+void UDPHandler::init_net(const char *base_ip, const uint16_t base_port)
 {
     net.set_dhcp(false);
 
     net.set_network(base_ip, "255.255.255.0", "");
 
-    printf("[UDPHandler]Start connection\n");
+    printf("[UDPHandler]Start connection \n");
 
 
     while(net.connect() != 0)
@@ -25,13 +25,11 @@ void UDPHandler::init_net(const char *base_ip)
         printf(".");
     }
 
-    printf("[UDPHandler]connection success\n");
-}
-
-void UDPHandler::open_udp(const uint16_t port)
-{
     udp.open(&net);
-    udp.bind(port);
+    udp.bind(base_port);
+
+    printf("[UDPHandler]connection success\n");
+    printf("%s:%d\n", base_ip, base_port);
 }
 
 void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
@@ -39,6 +37,7 @@ void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
     printf("set destination ip address and port\n");
     destination.set_ip_address(dest_ip);
     destination.set_port(port);
+    printf("%s:%d", dest_ip, port);
 }
 
 void UDPHandler::close()
