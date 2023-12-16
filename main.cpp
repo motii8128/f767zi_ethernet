@@ -3,6 +3,7 @@
 #include "interface.hpp"
 #include <cstdint>
 #include <stdint.h>
+#include "stm32f767xx.h"
 
 // main() runs in its own thread in the OS
 int main()
@@ -12,5 +13,20 @@ int main()
 
     const char *board_ip = "127.0.0.1";
     const uint16_t board_port = 5000;
+
+    UDPHandler handler;
+
+    handler.init_net(board_ip);
+
+    handler.open_udp(board_port);
+
+    handler.set_destination(unity_ip, unity_port);
+
+    while (1) {
+        std::string msg = "Hello, world";
+        handler.send<std::string>(msg);
+    }
+
+    handler.close();
 }
 
