@@ -1,5 +1,6 @@
 #include "handler.hpp"
 #include "SocketAddress.h"
+#include "stm32_hal_legacy.h"
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
@@ -35,13 +36,16 @@ void UDPHandler::open_udp(const uint16_t port)
 
 void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
 {
+    printf("set destination ip address and port\n");
     destination.set_ip_address(dest_ip);
     destination.set_port(port);
 }
 
 void UDPHandler::close()
 {
+    printf("[UDPHandler]close UDP\n");
     udp.close();
+    printf("disconnect net\n");
     net.disconnect();
 }
 
@@ -72,7 +76,8 @@ T UDPHandler::receive()
     {
         printf("[ERROR]Failed to receive\n");
         auto report = state_msg();
-        report.message = std::string("[MicroController] Failed to get data");
+        char msg[100] = "[MicroController] Failed to get data";
+        memcpy(report.message, msg, sizeof(msg));
         report.error = true;
         send<state_msg>(report);
 
@@ -82,7 +87,8 @@ T UDPHandler::receive()
         printf("[UDPHandler]receive data\n");
         
         auto report = state_msg();
-        report.message = std::string("[MicroController] Get data");
+        char msg[100] = "[MicroController] Get data";
+        memcpy(report.message, msg, sizeof(msg));
         report.error = false;
         send<state_msg>(report);
 
