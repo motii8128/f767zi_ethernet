@@ -2,6 +2,7 @@
 #include "handler.hpp"
 #include "interface.hpp"
 #include <cstdint>
+#include <cstring>
 #include <stdint.h>
 #include "stm32f767xx.h"
 
@@ -23,8 +24,10 @@ int main()
     handler.set_destination(unity_ip, unity_port);
 
     while (1) {
-        std::string msg = "Hello, world";
-        handler.send<std::string>(msg);
+        auto report = state_msg();
+        char msg[100] = "Hello, World";
+        report.error = false;
+        memcpy(report.message, msg, sizeof(msg));
     }
 
     handler.close();
