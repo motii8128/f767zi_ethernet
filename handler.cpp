@@ -1,5 +1,6 @@
 #include "handler.hpp"
 #include "SocketAddress.h"
+#include "nsapi_types.h"
 #include "stm32_hal_legacy.h"
 #include <cstdint>
 #include <cstdio>
@@ -11,33 +12,32 @@ UDPHandler::UDPHandler():msg("[MicroController]safe callback")
     close();
 }
 
-void UDPHandler::init_net(const char *base_ip, const uint16_t base_port)
+void UDPHandler::init_net()
 {
-    net.set_dhcp(false);
+    net.set_dhcp(true);
+    net.set_blocking(1500);
+    
+    printf("[UDPHandler]Start connection... \n");
 
-    net.set_network(base_ip, "255.255.255.0", "");
+    net.connect();
 
-    printf("[UDPHandler]Start connection \n");
+    printf("[UDPHandler] Successed to connect net .\n");
+}
 
-
-    while(net.connect() != 0)
-    {
-        printf(".");
-    }
-
+void UDPHandler::open_udp_server(const uint16_t base_port)
+{
+    SocketAddress address;
+    nsapi_error_t error = net.get_ip_address(&address);
     udp.open(&net);
     udp.bind(base_port);
-
-    printf("[UDPHandler]connection success\n");
-    printf("%s:%d\n", base_ip, base_port);
+    printf("[UDPHandler]open udp(%s:%d).\n", address.get_ip_address(), base_port);
 }
 
 void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
 {
-    printf("set destination ip address and port\n");
     destination.set_ip_address(dest_ip);
     destination.set_port(port);
-    printf("%s:%d", dest_ip, port);
+    printf("[UDPHandler]set destination (%s:%d)\n", dest_ip, port);
 }
 
 void UDPHandler::close()
@@ -55,21 +55,14 @@ void UDPHandler::report()
     {
         printf("[ERROR]Failed to send\n");
     }
-    else
-    {
-        
-    }
 }
 
-template <typename U>
-U UDPHandler::receive()
+void UDPHandler::receive(char buf[256])
 {
     SocketAddress source;
 
-    char buf[256];
-
-    memset(buf, 0, sizeof(buf));
-    if(const int result = udp.recvfrom(&source, buf, sizeof(buf)) < 0)
+    memset(buf, 0, sizeof(*buf));
+    if(const int result = udp.recvfrom(&source, buf, sizeof(*buf)) < 0)
     {
         printf("[ERROR]Failed to receive\n");
     }
@@ -78,6 +71,5 @@ U UDPHandler::receive()
         printf("[UDPHandler]receive data\n");
         report();
 
-        return deserialize<U>(buf);
     }
 }

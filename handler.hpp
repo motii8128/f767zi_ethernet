@@ -3,26 +3,24 @@
 
 #include "SocketAddress.h"
 #include "UDPSocket.h"
-#include "mbed.h"
 #include "EthernetInterface.h"
+#include "mbed.h"
 #include "rtos.h"
 #include <cstdint>
 #include <stdint.h>
 #include <vector>
 
-#include "interface.hpp"
 
 class UDPHandler{
     public:
         UDPHandler();
-        void init_net(const char *base_ip, const uint16_t base_port);
+        void init_net();
+        void open_udp_server(const uint16_t base_port);
         void set_destination(const char *dest_ip, const uint16_t port);
         void close();
 
         void report();
-
-        template<typename U> 
-        U receive();
+        void receive(char buf[256]);
         
     private:
         EthernetInterface net;
