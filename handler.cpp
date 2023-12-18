@@ -1,11 +1,7 @@
 #include "handler.hpp"
-#include "SocketAddress.h"
-#include "nsapi_types.h"
-#include "stm32_hal_legacy.h"
+#include <algorithm>
 #include <cstdint>
-#include <cstdio>
-#include <cstring>
-#include <string>
+#include <vector>
 
 UDPHandler::UDPHandler()
 {
@@ -49,20 +45,22 @@ void UDPHandler::close()
 }
 
 
-void UDPHandler::pub(const char *data)
+void UDPHandler::send_data(vector<uint8_t> data)
 {
-    if(const int result = udp.sendto(destination, data, sizeof(data)) < 0)
+    uint8_t array[data.size()];
+    std::copy(data.begin(), data.end(), array);
+    if(const int result = udp.sendto(destination, array, data.size() < 0))
     {
         printf("[ERROR]Failed to send\n");
     }
 }
 
-void UDPHandler::sub(char *buf[256])
+vector<uint8_t> UDPHandler::recv_data()
 {
     SocketAddress source;
-
-    memset(buf, 0, sizeof(*buf));
-    const int result = udp.recvfrom(&source, buf, sizeof(*buf));
+    vector<uint8_t> data;
+    uint8_t buf[128] = {0};
+    int result = udp.recvfrom(&source, buf, sizeof(buf));
     if(result < 0)
     {
         printf("[ERROR]Failed to receive\n");
@@ -70,6 +68,14 @@ void UDPHandler::sub(char *buf[256])
     else
     {
         printf("[UDPHandler]receive data\n");
-        *buf[result] = '\0';
+        for(int i = 0; i < result; i++)
+        {
+            data.push_back(buf[i]);
+        }
+
+        data.erase(data.begin());
+        data.pop_back();
     }
+
+    return data;
 }

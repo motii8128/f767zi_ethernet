@@ -7,9 +7,7 @@
 #include "mbed.h"
 #include "rtos.h"
 #include <cstdint>
-#include <stdint.h>
 #include <vector>
-
 
 class UDPHandler{
     public:
@@ -19,8 +17,8 @@ class UDPHandler{
         void set_destination(const char *dest_ip, const uint16_t port);
         void close();
 
-        void pub(const char *data);
-        void sub(char *buf[256]);
+        void send_data(vector<uint8_t> data);
+        vector<uint8_t> recv_data();
         
     private:
         EthernetInterface net;
