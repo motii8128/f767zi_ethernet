@@ -1,6 +1,8 @@
 #include "handler.hpp"
+#include "nsapi_types.h"
 #include <algorithm>
 #include <cstdint>
+#include <cstdio>
 #include <vector>
 
 UDPHandler::UDPHandler()
@@ -10,12 +12,22 @@ UDPHandler::UDPHandler()
 
 void UDPHandler::init_net()
 {
-    net.set_dhcp(true);
-    net.set_blocking(1500);
+    if(net.set_dhcp(true) != NSAPI_ERROR_OK)
+    {
+        printf("[ERROR] Failed to set mode(dhcp)");
+    }
+    if(net.set_blocking(1500) != NSAPI_ERROR_OK)
+    {
+        printf("[ERROR]Failed to set timeout\n");
+    }
     
     printf("[UDPHandler]Start connection... \n");
 
-    net.connect();
+    if(net.connect() != NSAPI_ERROR_OK)
+    {
+        printf("[ERROR] Failed to connect net.\n");
+        close();
+    }
 
     printf("[UDPHandler] Successed to connect net .\n");
 }
