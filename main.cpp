@@ -2,10 +2,11 @@
 #include "PinNames.h"
 #include "ThisThread.h"
 #include "mbed.h"
-#include "stm32f767xx.h"
 
 #include "handler.hpp"
 #include "interface.hpp"
+#include <cstdint>
+#include <vector>
 
 DigitalOut led1(LED1);
 DigitalOut led2(LED2);
@@ -31,8 +32,8 @@ int main()
     while (1) {
         led3 = 0;
         ThisThread::sleep_for(1s);
-        const char *data = "Hello, World";
-        handler.pub(data);
+        vector<uint8_t> data = serialize("Hello, World");
+        handler.send_data(data);
         led3 = 1;
         ThisThread::sleep_for(1s);
     }
