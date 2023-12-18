@@ -19,14 +19,13 @@ class UDPHandler{
         void set_destination(const char *dest_ip, const uint16_t port);
         void close();
 
-        void report();
-        void receive(char buf[256]);
+        void pub(const char *data);
+        void sub(char *buf[256]);
         
     private:
         EthernetInterface net;
         SocketAddress destination, source, base_data;
         UDPSocket udp;
-        const char msg[100];
 };
 
 #endif

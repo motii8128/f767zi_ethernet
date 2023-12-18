@@ -7,7 +7,7 @@
 #include <cstring>
 #include <string>
 
-UDPHandler::UDPHandler():msg("[MicroController]safe callback")
+UDPHandler::UDPHandler()
 {
     close();
 }
@@ -30,7 +30,7 @@ void UDPHandler::open_udp_server(const uint16_t base_port)
     nsapi_error_t error = net.get_ip_address(&address);
     udp.open(&net);
     udp.bind(base_port);
-    printf("[UDPHandler]open udp(%s:%d).\n", address.get_ip_address(), base_port);
+    printf("[UDPHandler]open UDP(%s:%d).\n", address.get_ip_address(), base_port);
 }
 
 void UDPHandler::set_destination(const char *dest_ip, const uint16_t port)
@@ -49,27 +49,27 @@ void UDPHandler::close()
 }
 
 
-void UDPHandler::report()
+void UDPHandler::pub(const char *data)
 {
-    if(const int result = udp.sendto(destination, msg, sizeof(msg)) < 0)
+    if(const int result = udp.sendto(destination, data, sizeof(data)) < 0)
     {
         printf("[ERROR]Failed to send\n");
     }
 }
 
-void UDPHandler::receive(char buf[256])
+void UDPHandler::sub(char *buf[256])
 {
     SocketAddress source;
 
     memset(buf, 0, sizeof(*buf));
-    if(const int result = udp.recvfrom(&source, buf, sizeof(*buf)) < 0)
+    const int result = udp.recvfrom(&source, buf, sizeof(*buf));
+    if(result < 0)
     {
         printf("[ERROR]Failed to receive\n");
     }
     else
     {
         printf("[UDPHandler]receive data\n");
-        report();
-
+        *buf[result] = '\0';
     }
 }
